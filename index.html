@@ -186,8 +186,6 @@
     <div id="controls" class="absolute top-4 left-4 z-20 bg-gray-800/80 backdrop-blur-sm text-white p-4 rounded-lg shadow-2xl border border-gray-600 flex flex-col space-y-3">
         <h1 class="text-3xl text-center text-yellow-300">Controls</h1>
         <div id="userInfo" class="text-xs text-center bg-gray-700 p-2 rounded-md break-all">Connecting...</div>
-        <button id="googleSignInBtn" class="px-4 py-2 bg-white text-gray-800 font-bold rounded-md hover:bg-gray-200 transition-transform transform hover:scale-105 shadow-lg hidden">Sign in with Google</button>
-        <button id="signOutBtn" class="px-4 py-2 bg-gray-500 text-white font-bold rounded-md hover:bg-gray-600 transition-transform transform hover:scale-105 shadow-lg hidden">Sign Out</button>
         <button id="addNoteBtn" class="px-4 py-2 bg-yellow-400 text-gray-900 font-bold rounded-md hover:bg-yellow-500 transition-transform transform hover:scale-105 shadow-lg cursor-grab">Add Notebox</button>
         <button id="connectModeBtn" class="px-4 py-2 bg-red-500 text-white font-bold rounded-md hover:bg-red-600 transition-transform transform hover:scale-105 shadow-lg">Connect Notebox</button>
         <button id="deleteConnectionBtn" class="px-4 py-2 bg-purple-500 text-white font-bold rounded-md hover:bg-purple-600 transition-transform transform hover:scale-105 shadow-lg">Delete Connection</button>
@@ -239,7 +237,7 @@
 
         // --- REST OF YOUR EXISTING SCRIPT WITH UPDATED FIREBASE CONFIG ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, collection, onSnapshot, addDoc, updateDoc, deleteDoc, writeBatch, getDocs, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const board = document.getElementById('board');
@@ -254,8 +252,6 @@
         const toggleThemeBtn = document.getElementById('toggleThemeBtn');
         const clearBoardBtn = document.getElementById('clearBoardBtn');
         const userInfoDiv = document.getElementById('userInfo');
-        const googleSignInBtn = document.getElementById('googleSignInBtn');
-        const signOutBtn = document.getElementById('signOutBtn');
         const messageBox = document.getElementById('message-box');
         const confirmationModal = document.getElementById('confirmation-modal');
         const modalText = document.getElementById('modal-text');
@@ -308,36 +304,19 @@
             onAuthStateChanged(auth, user => {
                 if (user) {
                     userId = user.uid;
-                    const displayName = user.displayName || user.email || userId;
-                    userInfoDiv.innerHTML = `<strong>Detective:</strong><br>${displayName}`;
-                    googleSignInBtn.classList.add('hidden');
-                    signOutBtn.classList.remove('hidden');
+                    userInfoDiv.innerHTML = `<strong>Detective ID:</strong><br>${userId}`;
                     setupRealtimeListeners();
                 } else {
-                    userInfoDiv.textContent = 'Please sign in to continue.';
-                    googleSignInBtn.classList.remove('hidden');
-                    signOutBtn.classList.add('hidden');
+                    userInfoDiv.textContent = 'Authenticating...';
                 }
             });
 
-            const provider = new GoogleAuthProvider();
-
-            googleSignInBtn.addEventListener('click', async () => {
-                try {
-                    await signInWithPopup(auth, provider);
-                } catch (error) {
-                    console.error("Authentication failed:", error);
-                    userInfoDiv.textContent = 'Authentication Failed.';
-                }
-            });
-
-            signOutBtn.addEventListener('click', async () => {
-                try {
-                    await signOut(auth);
-                } catch (error) {
-                    console.error("Sign out failed:", error);
-                }
-            });
+            try {
+                await signInAnonymously(auth);
+            } catch (error) {
+                console.error("Authentication failed:", error);
+                userInfoDiv.textContent = 'Authentication Failed.';
+            }
         }
 
         function setupRealtimeListeners() {
