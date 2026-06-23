@@ -305,6 +305,14 @@
             });
         }
 
+        function handleWriteError(error) {
+            console.error("Firestore write failed:", error);
+            messageBox.querySelector('p').textContent =
+                "Couldn't save change. Check Firestore rules / permissions.";
+            messageBox.classList.remove('hidden');
+            setTimeout(() => messageBox.classList.add('hidden'), 4000);
+        }
+
         function setupRealtimeListeners() {
             onSnapshot(notesCollection, (snapshot) => {
                 snapshot.docChanges().forEach((change) => {
@@ -346,7 +354,7 @@
                 panContainer.appendChild(noteEl);
                 if (noteData.rotation === undefined) {
                     const rotation = Math.random() * 8 - 4;
-                    updateDoc(doc(notesCollection, noteData.id), { rotation });
+                    updateDoc(doc(notesCollection, noteData.id), { rotation }).catch(handleWriteError);
                     noteData.rotation = rotation;
                 }
                 noteEl.addEventListener('mousedown', handleNoteMouseDown);
@@ -468,7 +476,7 @@
                 messageBox.querySelector('p').textContent = "Selected first notebox. Click another to connect.";
             } else {
                 if (firstConnectionPoint === noteEl.id) return;
-                addDoc(connectionsCollection, { path: [firstConnectionPoint, noteEl.id] });
+                addDoc(connectionsCollection, { path: [firstConnectionPoint, noteEl.id] }).catch(handleWriteError);
                 document.getElementById(firstConnectionPoint).style.outline = 'none';
                 connectModeBtn.click();
             }
@@ -499,9 +507,9 @@
                 const newText = textarea.value.trim();
                 textarea.replaceWith(contentDiv);
                 if (newText && newText !== currentText) {
-                    updateDoc(doc(notesCollection, noteEl.id), { text: newText });
+                    updateDoc(doc(notesCollection, noteEl.id), { text: newText }).catch(handleWriteError);
                 } else if (!newText) {
-                    updateDoc(doc(notesCollection, noteEl.id), { text: 'Double-click to edit...' });
+                    updateDoc(doc(notesCollection, noteEl.id), { text: 'Double-click to edit...' }).catch(handleWriteError);
                 }
                 noteEl.addEventListener('mousedown', handleNoteMouseDown);
             };
@@ -650,7 +658,7 @@
                     updates.rotation = noteData.rotation;
                 }
                 if (Object.keys(updates).length > 0) {
-                    updateDoc(doc(notesCollection, noteId), updates);
+                    updateDoc(doc(notesCollection, noteId), updates).catch(handleWriteError);
                 }
                 activeNote.classList.remove('is-dragging', 'is-rotating', 'is-resizing');
             }
@@ -717,7 +725,7 @@
                     rotation: Math.random() * 8 - 4,
                     width: 200,
                     height: 150
-                });
+                }).catch(handleWriteError);
             }
         }
         function showConfirmationModal(message, onConfirm) {
