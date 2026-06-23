@@ -156,28 +156,9 @@
         #board.ring {
             box-shadow: 0 0 0 6px #facc15, inset 0 0 20px rgba(0,0,0,0.5);
         }
-        /* Password modal styles */
-        #password-modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.85);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
     </style>
 </head>
 <body class="w-screen h-screen m-0 p-0">
-    <!-- Password Modal -->
-    <div id="password-modal">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-8 w-full max-w-xs mx-4 flex flex-col items-center" style="font-family: 'Kalam', cursive;">
-            <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">Enter Password</h2>
-            <input id="password-input" type="password" class="mb-4 px-4 py-2 rounded border border-gray-400 w-full text-lg" placeholder="Password" autofocus>
-            <button id="password-submit" class="px-5 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 transition-colors w-full font-bold">Access</button>
-            <div id="password-error" class="text-red-500 mt-2 hidden text-center">Incorrect password. Try again.</div>
-        </div>
-    </div>
     <div id="board" class="w-full h-full">
         <div id="pan-container">
             <svg id="connections-svg"></svg>
@@ -208,35 +189,6 @@
         </div>
     </div>
     <script type="module">
-        // --- PASSWORD PROTECTION ONLY ---
-        const passwordModal = document.getElementById('password-modal');
-        const passwordInput = document.getElementById('password-input');
-        const passwordSubmit = document.getElementById('password-submit');
-        const passwordError = document.getElementById('password-error');
-        const CORRECT_PASSWORD = "makuta";
-
-        function unlockBoard() {
-            passwordModal.style.display = "none";
-        }
-
-        passwordSubmit.addEventListener('click', () => {
-            if (passwordInput.value === CORRECT_PASSWORD) {
-                unlockBoard();
-            } else {
-                passwordError.classList.remove('hidden');
-                passwordInput.value = "";
-                passwordInput.focus();
-            }
-        });
-
-        passwordInput.addEventListener('keydown', (e) => {
-            if (e.key === "Enter") passwordSubmit.click();
-        });
-
-        window.addEventListener('DOMContentLoaded', () => {
-            passwordInput.focus();
-        });
-
         // --- REST OF YOUR EXISTING SCRIPT WITH UPDATED FIREBASE CONFIG ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -307,8 +259,8 @@
 
             // --- ONLY THESE GOOGLE ACCOUNTS MAY ACCESS THE BOARD ---
             const ALLOWED_EMAILS = [
-                "murali07dhar@gmail.com",
-                "funinmotivation16@gmail.com"
+                "you@gmail.com",
+                "yourfriend@gmail.com"
             ];
 
             onAuthStateChanged(auth, user => {
