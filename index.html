@@ -305,8 +305,21 @@
             notesCollection = collection(db, `${boardPath}/notes`);
             connectionsCollection = collection(db, `${boardPath}/connections`);
 
+            // --- ONLY THESE GOOGLE ACCOUNTS MAY ACCESS THE BOARD ---
+            const ALLOWED_EMAILS = [
+                "you@gmail.com",
+                "yourfriend@gmail.com"
+            ];
+
             onAuthStateChanged(auth, user => {
                 if (user) {
+                    if (!ALLOWED_EMAILS.includes(user.email)) {
+                        userInfoDiv.textContent = 'Access denied for this account.';
+                        googleSignInBtn.classList.add('hidden');
+                        signOutBtn.classList.remove('hidden');
+                        signOut(auth);
+                        return;
+                    }
                     userId = user.uid;
                     const displayName = user.displayName || user.email || userId;
                     userInfoDiv.innerHTML = `<strong>Detective:</strong><br>${displayName}`;
