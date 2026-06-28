@@ -209,6 +209,24 @@ function createOrUpdateNoteElement(noteData) {
 
 function renderConnections() {
     connectionsSvg.innerHTML = '';
+
+    // Arrowhead marker, defined once per render.
+    const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+    marker.setAttribute('id', 'connection-arrow');
+    marker.setAttribute('viewBox', '0 0 10 10');
+    marker.setAttribute('refX', '8');
+    marker.setAttribute('refY', '5');
+    marker.setAttribute('markerWidth', '7');
+    marker.setAttribute('markerHeight', '7');
+    marker.setAttribute('orient', 'auto-start-reverse');
+    const arrowPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    arrowPath.setAttribute('d', 'M 0 0 L 10 5 L 0 10 z');
+    arrowPath.setAttribute('fill', '#6D5EF8');
+    marker.appendChild(arrowPath);
+    defs.appendChild(marker);
+    connectionsSvg.appendChild(defs);
+
     localConnections.forEach(conn => {
         if (conn.path && conn.path.length >= 2) {
             const noteAData = localNotes.get(conn.path[0]);
@@ -218,26 +236,33 @@ function renderConnections() {
                 const noteAHeight = noteAData.height || 150;
                 const noteBWidth = noteBData.width || 200;
                 const noteBHeight = noteBData.height || 150;
-                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                line.dataset.id = conn.id;
-                line.classList.add('connection-line');
-                line.classList.toggle('is-deletable', isDeleteConnectionMode);
-                line.setAttribute('x1', noteAData.x + noteAWidth / 2);
-                line.setAttribute('y1', noteAData.y + noteAHeight / 2);
-                line.setAttribute('x2', noteBData.x + noteBWidth / 2);
-                line.setAttribute('y2', noteBData.y + noteBHeight / 2);
-                line.setAttribute('stroke', '#D53F8C');
-                line.setAttribute('stroke-width', '4');
-                line.setAttribute('stroke-dasharray', '10, 5');
-                line.addEventListener('click', handleDeleteConnectionClick);
-                const anim = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
-                anim.setAttribute('attributeName', 'stroke-dashoffset');
-                anim.setAttribute('from', '0');
-                anim.setAttribute('to', '15');
-                anim.setAttribute('dur', '0.5s');
-                anim.setAttribute('repeatCount', 'indefinite');
-                line.appendChild(anim);
-                connectionsSvg.appendChild(line);
+                const x1 = noteAData.x + noteAWidth / 2;
+                const y1 = noteAData.y + noteAHeight / 2;
+                const x2 = noteBData.x + noteBWidth / 2;
+                const y2 = noteBData.y + noteBHeight / 2;
+                // Gentle curve through the midpoint, offset perpendicular to
+                // the line so parallel connections don't overlap exactly.
+                const mx = (x1 + x2) / 2;
+                const my = (y1 + y2) / 2;
+                const dx = x2 - x1;
+                const dy = y2 - y1;
+                const len = Math.hypot(dx, dy) || 1;
+                const curveAmount = Math.min(len * 0.12, 40);
+                const cx = mx - (dy / len) * curveAmount;
+                const cy = my + (dx / len) * curveAmount;
+
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.dataset.id = conn.id;
+                path.classList.add('connection-line');
+                path.classList.toggle('is-deletable', isDeleteConnectionMode);
+                path.setAttribute('d', `M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`);
+                path.setAttribute('fill', 'none');
+                path.setAttribute('stroke', '#6D5EF8');
+                path.setAttribute('stroke-width', '2.5');
+                path.setAttribute('stroke-linecap', 'round');
+                path.setAttribute('marker-end', 'url(#connection-arrow)');
+                path.addEventListener('click', handleDeleteConnectionClick);
+                connectionsSvg.appendChild(path);
             }
         }
     });
@@ -274,7 +299,7 @@ connectModeBtn.addEventListener('click', () => {
         isConnectMode = true;
         connectModeBtn.textContent = 'Cancel Connect';
         connectModeBtn.classList.replace('bg-red-500', 'bg-gray-500');
-        showMessage('Click two noteboxes to connect them with yarn.');
+        showMessage('Click two notes to connect them.');
     }
 });
 
@@ -318,8 +343,8 @@ function handleNoteSingleClick(e) {
 function handleConnectionClick(noteEl) {
     if (!firstConnectionPoint) {
         firstConnectionPoint = noteEl.id;
-        noteEl.style.outline = '4px solid #FBBF24';
-        showMessage("Selected first notebox. Click another to connect.");
+        noteEl.style.outline = '3px solid #6D5EF8';
+        showMessage("Selected first note. Click another to connect.");
     } else {
         if (firstConnectionPoint === noteEl.id) return;
         addDoc(connectionsCollection, { path: [firstConnectionPoint, noteEl.id] })
@@ -334,7 +359,7 @@ function handleDeleteConnectionClick(e) {
     if (!isDeleteConnectionMode) return;
     const connectionId = e.currentTarget.dataset.id;
     if (!connectionId) return;
-    showConfirmationModal('Delete this connection yarn?', async () => {
+    showConfirmationModal('Delete this connection?', async () => {
         await deleteDoc(doc(connectionsCollection, connectionId));
         touchBoardUpdatedAt();
         deleteConnectionBtn.click();
@@ -399,7 +424,7 @@ async function deleteNoteById(noteId) {
 function deactivateAllModes() {
     if (isConnectMode) {
         isConnectMode = false;
-        connectModeBtn.textContent = 'Connect Notebox';
+        connectModeBtn.textContent = 'Connect Note';
         connectModeBtn.classList.replace('bg-gray-500', 'bg-red-500');
         if (firstConnectionPoint) {
             const el = document.getElementById(firstConnectionPoint);
@@ -417,7 +442,7 @@ function deactivateAllModes() {
     }
     if (isDeleteMode) {
         isDeleteMode = false;
-        deleteModeBtn.textContent = 'Delete Notebox';
+        deleteModeBtn.textContent = 'Delete Note';
         deleteModeBtn.classList.replace('bg-red-600', 'bg-gray-600');
         document.querySelectorAll('.note').forEach(n => n.classList.remove('is-deletable'));
     }
@@ -570,7 +595,7 @@ function startAddNoteDrag(e) {
     ghostNote.style.zIndex = '1000';
     ghostNote.style.pointerEvents = 'none';
     ghostNote.style.opacity = '0.7';
-    ghostNote.innerHTML = `<div class="note-pin"></div><div class="note-content">New Notebox...</div>`;
+    ghostNote.innerHTML = `<div class="note-pin"></div><div class="note-content">New note...</div>`;
     document.body.appendChild(ghostNote);
     moveGhostNote(e);
     window.addEventListener('mousemove', onAddNoteDrag);
