@@ -40,25 +40,10 @@ function boardsCollection(uid) {
     return collection(db, 'users', uid, 'boards');
 }
 
-/** Small deterministic tilt per card so the layout doesn't reshuffle on
- *  every re-render, but still feels hand-pinned rather than grid-perfect. */
-function tiltForId(id) {
-    let hash = 0;
-    for (let i = 0; i < id.length; i++) {
-        hash = (hash * 31 + id.charCodeAt(i)) % 1000;
-    }
-    const deg = (hash / 1000) * 3 - 1.5; // range: -1.5deg .. 1.5deg
-    return `${deg.toFixed(2)}deg`;
-}
-
 function renderBoardCard(boardId, data) {
     const card = document.createElement('div');
     card.className = 'board-card';
     card.dataset.id = boardId;
-    card.style.setProperty('--tilt', tiltForId(boardId));
-
-    const pin = document.createElement('span');
-    pin.className = 'board-card-pin';
 
     const title = document.createElement('h3');
     title.className = 'board-card-title';
@@ -81,7 +66,6 @@ function renderBoardCard(boardId, data) {
         handleDeleteBoard(boardId, data.title);
     });
 
-    card.appendChild(pin);
     card.appendChild(deleteBtn);
     card.appendChild(title);
     card.appendChild(meta);
