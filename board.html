@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planner board</title>
+    <title>Canvas — Planner</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Permanent+Marker&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="w-screen h-screen m-0 p-0">
@@ -16,31 +16,32 @@
             <svg id="connections-svg"></svg>
         </div>
     </div>
-    <div id="controls" class="absolute top-4 left-4 z-20 controls-panel flex flex-col space-y-3">
+    <div id="controls" class="absolute top-4 left-4 z-20 controls-panel flex flex-col space-y-2">
         <div class="controls-header">
-            <span class="controls-pin"></span>
+            <button id="backToDashboardBtn" class="back-link">&larr; Boards</button>
             <h1 id="boardTitleDisplay" class="controls-title">Loading…</h1>
         </div>
-        <button id="backToDashboardBtn" class="btn-ghost-board">&larr; My Boards</button>
-        <div id="userInfo" class="dash-user-chip">Connecting...</div>
-        <button id="googleSignInBtn" class="btn-paper hidden">Sign in with Google</button>
-        <button id="signOutBtn" class="btn-ghost-board hidden">Sign Out</button>
-        <button id="addNoteBtn" class="btn-board btn-board-amber cursor-grab">Add Notebox</button>
-        <button id="connectModeBtn" class="btn-board btn-board-red">Connect Notebox</button>
-        <button id="deleteConnectionBtn" class="btn-board btn-board-purple">Delete Connection</button>
-        <button id="deleteModeBtn" class="btn-board btn-board-gray">Delete Notebox</button>
-        <button id="toggleThemeBtn" class="btn-board btn-board-indigo">Toggle Theme</button>
-        <button id="clearBoardBtn" class="btn-board btn-board-blue">Clear Board</button>
+        <div id="userInfo" class="user-chip">Connecting...</div>
+        <button id="googleSignInBtn" class="btn-primary hidden">Sign in with Google</button>
+        <button id="signOutBtn" class="btn-secondary hidden">Sign out</button>
+        <div class="controls-divider"></div>
+        <button id="addNoteBtn" class="btn-secondary cursor-grab">Add note</button>
+        <button id="connectModeBtn" class="btn-secondary">Connect notes</button>
+        <button id="deleteConnectionBtn" class="btn-secondary">Remove connection</button>
+        <button id="deleteModeBtn" class="btn-secondary">Delete note</button>
+        <div class="controls-divider"></div>
+        <button id="toggleThemeBtn" class="btn-ghost">Toggle theme</button>
+        <button id="clearBoardBtn" class="btn-danger-ghost">Clear board</button>
     </div>
-    <div id="message-box" class="hidden absolute bottom-10 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-3 rounded-lg shadow-xl z-30">
-        <p>Click two noteboxes to connect them with yarn.</p>
+    <div id="message-box" class="hidden absolute bottom-10 left-1/2 -translate-x-1/2 toast-pill z-30">
+        <p>Click two notes to connect them.</p>
     </div>
-    <div id="confirmation-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex justify-center items-center">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 w-full max-w-sm mx-4" style="font-family: 'Kalam', cursive;">
-            <p id="modal-text" class="text-lg text-gray-900 dark:text-gray-100 mb-6 text-center">Are you sure?</p>
-            <div class="flex justify-end space-x-4">
-                <button id="modal-cancel-btn" class="px-5 py-2 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors">Cancel</button>
-                <button id="modal-confirm-btn" class="px-5 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors">Confirm</button>
+    <div id="confirmation-modal" class="hidden fixed inset-0 modal-backdrop z-50 flex justify-center items-center">
+        <div class="modal-card">
+            <p id="modal-text" class="modal-text">Are you sure?</p>
+            <div class="flex justify-end space-x-3">
+                <button id="modal-cancel-btn" class="btn-secondary">Cancel</button>
+                <button id="modal-confirm-btn" class="btn-danger">Confirm</button>
             </div>
         </div>
     </div>
