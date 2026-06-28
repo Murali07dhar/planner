@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planner — Boards</title>
+    <title>Boards — Planner</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Permanent+Marker&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="dashboard-body w-screen min-h-screen m-0 p-0">
@@ -15,40 +15,39 @@
     <header class="dash-header">
         <div class="dash-header-inner">
             <div class="dash-brand">
-                <span class="dash-pin"></span>
-                <h1 class="dash-title">The Boards</h1>
-                <span class="dash-subtitle">case files &amp; corkboards</span>
+                <span class="dash-mark"></span>
+                <h1 class="dash-title">Boards</h1>
             </div>
             <div class="dash-account">
-                <div id="userInfo" class="dash-user-chip">Connecting...</div>
-                <button id="googleSignInBtn" class="btn-paper hidden">Sign in with Google</button>
-                <button id="signOutBtn" class="btn-ghost hidden">Sign Out</button>
+                <div id="userInfo" class="user-chip">Connecting...</div>
+                <button id="googleSignInBtn" class="btn-primary hidden">Sign in with Google</button>
+                <button id="signOutBtn" class="btn-secondary hidden">Sign out</button>
             </div>
         </div>
     </header>
 
     <main class="dash-main">
         <div class="dash-toolbar">
-            <p class="dash-toolbar-label">Pin a new case to the board</p>
-            <button id="createBoardBtn" disabled class="btn-create">+ New Board</button>
+            <p class="dash-toolbar-label">All your canvases in one place</p>
+            <button id="createBoardBtn" disabled class="btn-primary">+ New board</button>
         </div>
 
         <div id="boardsGrid" class="boards-grid"></div>
 
         <div id="emptyState" class="hidden empty-state">
-            <div class="empty-state-pin"></div>
-            <p class="empty-state-title">The board is bare.</p>
-            <p class="empty-state-sub">Click <strong>+ New Board</strong> to pin your first case.</p>
+            <div class="empty-state-icon"></div>
+            <p class="empty-state-title">No boards yet</p>
+            <p class="empty-state-sub">Click <strong>+ New board</strong> to create your first one.</p>
         </div>
     </main>
 
-    <div id="create-board-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex justify-center items-center">
-        <div class="create-modal-card">
+    <div id="create-board-modal" class="hidden fixed inset-0 modal-backdrop z-50 flex justify-center items-center">
+        <div class="modal-card">
             <p class="create-modal-label">Name this board</p>
-            <input id="create-board-input" type="text" maxlength="60" placeholder="e.g. The Hollow Pines Case" class="create-modal-input" />
+            <input id="create-board-input" type="text" maxlength="60" placeholder="e.g. Product roadmap" class="create-modal-input" />
             <div class="create-modal-actions">
-                <button id="create-board-cancel" class="btn-ghost">Cancel</button>
-                <button id="create-board-confirm" class="btn-create">Pin it</button>
+                <button id="create-board-cancel" class="btn-secondary">Cancel</button>
+                <button id="create-board-confirm" class="btn-primary">Create</button>
             </div>
         </div>
     </div>
