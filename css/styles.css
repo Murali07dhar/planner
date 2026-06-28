@@ -1,0 +1,224 @@
+/* css/styles.css */
+/* Original canvas styles, unchanged, plus new dashboard styles below. */
+
+body {
+    font-family: 'Kalam', cursive;
+    overscroll-behavior: none;
+    background-color: #3D352E;
+    user-select: none;
+    transition: background-color 0.3s ease-in-out;
+}
+.dark body {
+    background-color: #1a202c;
+}
+#board {
+    background-image: url('https://www.transparenttextures.com/patterns/cork-wallet.png');
+    background-color: #5C4033;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    overflow: hidden;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+    transition: background-color 0.3s ease-in-out;
+    cursor: grab;
+}
+#board.is-panning {
+    cursor: grabbing;
+}
+.dark #board {
+    background-image: url('https://www.transparenttextures.com/patterns/dark-wood.png');
+    background-color: #2D3748;
+}
+#pan-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5000px;
+    height: 5000px;
+    transform-origin: 0 0;
+}
+.note {
+    position: absolute;
+    width: 200px;
+    height: 150px;
+    padding: 20px 15px 15px 15px;
+    background-color: #A0AEC0;
+    box-shadow: 5px 5px 15px rgba(0,0,0,0.3);
+    cursor: grab;
+    transition: box-shadow 0.1s ease-in-out, border-color 0.2s ease-in-out, background-color 0.3s ease-in-out;
+    border: 2px solid transparent;
+    display: flex;
+}
+.dark .note {
+    background-color: #4A5568;
+    border-color: #718096;
+}
+.note.is-deletable {
+    cursor: crosshair;
+    border-color: #E53E3E;
+    box-shadow: 0 0 20px rgba(229, 62, 62, 0.7);
+}
+.note.is-dragging, .note.is-rotating, .note.is-resizing {
+    cursor: grabbing;
+    z-index: 100;
+    box-shadow: 10px 10px 25px rgba(0,0,0,0.4);
+    transform-origin: center center;
+}
+.note-pin {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 20px;
+    background-color: #E53E3E;
+    border-radius: 50%;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+    border: 2px solid #C53030;
+    cursor: crosshair;
+    z-index: 2;
+}
+.note-content {
+    flex-grow: 1;
+    font-size: 18px;
+    line-height: 1.4;
+    color: #333;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    transition: color 0.3s ease-in-out;
+}
+.dark .note-content {
+    color: #F7FAFC;
+}
+.note-textarea {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: transparent;
+    resize: none;
+    outline: none;
+    font-family: 'Kalam', cursive;
+    font-size: 18px;
+    line-height: 1.4;
+    color: #E2E8F0;
+}
+.dark .note-textarea {
+    color: #F7FAFC;
+}
+.resize-handle {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 0 20px 20px;
+    border-color: transparent transparent rgba(0,0,0,0.2) transparent;
+    cursor: nwse-resize;
+    z-index: 2;
+}
+#connections-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5000px;
+    height: 5000px;
+    pointer-events: none;
+}
+#connections-svg.is-active {
+    pointer-events: auto;
+}
+.connection-line {
+    transition: stroke-width 0.2s ease, stroke 0.2s ease;
+    pointer-events: none;
+}
+.connection-line.is-deletable {
+    pointer-events: auto;
+    cursor: crosshair;
+}
+.connection-line.is-deletable:hover {
+    stroke: #E53E3E !important;
+    stroke-width: 8 !important;
+}
+#controls {
+    font-family: 'Permanent Marker', cursive;
+}
+#board.ring {
+    box-shadow: 0 0 0 6px #facc15, inset 0 0 20px rgba(0,0,0,0.5);
+}
+
+/* --------------------------------------------------------------------- */
+/* Dashboard-only styles (new)                                           */
+/* --------------------------------------------------------------------- */
+.dashboard-body {
+    min-height: 100vh;
+    background-color: #3D352E;
+}
+.dark .dashboard-body {
+    background-color: #1a202c;
+}
+.boards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.25rem;
+}
+.board-card {
+    position: relative;
+    background-color: #A0AEC0;
+    border: 2px solid transparent;
+    border-radius: 0.5rem;
+    padding: 1.25rem 1rem 1rem 1rem;
+    box-shadow: 5px 5px 15px rgba(0,0,0,0.3);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.board-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 8px 8px 20px rgba(0,0,0,0.4);
+}
+.dark .board-card {
+    background-color: #4A5568;
+    border-color: #718096;
+}
+.board-card-title {
+    font-size: 1.25rem;
+    color: #1a202c;
+    margin: 0 0 0.4rem 0;
+    word-break: break-word;
+}
+.dark .board-card-title {
+    color: #F7FAFC;
+}
+.board-card-meta {
+    font-size: 0.85rem;
+    color: #2D3748;
+    margin: 0;
+}
+.dark .board-card-meta {
+    color: #CBD5E0;
+}
+.board-card-delete {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.4rem;
+    width: 22px;
+    height: 22px;
+    line-height: 22px;
+    text-align: center;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.15);
+    color: #1a202c;
+    font-size: 0.8rem;
+    border: none;
+    cursor: pointer;
+}
+.board-card-delete:hover {
+    background: #E53E3E;
+    color: white;
+}
+.dark .board-card-delete {
+    color: #F7FAFC;
+    background: rgba(0,0,0,0.3);
+}
