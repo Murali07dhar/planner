@@ -28,6 +28,11 @@ const createBoardBtn = document.getElementById('createBoardBtn');
 const boardsGrid = document.getElementById('boardsGrid');
 const emptyState = document.getElementById('emptyState');
 
+const createModal = document.getElementById('create-board-modal');
+const createInput = document.getElementById('create-board-input');
+const createConfirmBtn = document.getElementById('create-board-confirm');
+const createCancelBtn = document.getElementById('create-board-cancel');
+
 let boardsCollectionRef = null;
 let unsubscribeBoards = null;
 
@@ -35,10 +40,25 @@ function boardsCollection(uid) {
     return collection(db, 'users', uid, 'boards');
 }
 
+/** Small deterministic tilt per card so the layout doesn't reshuffle on
+ *  every re-render, but still feels hand-pinned rather than grid-perfect. */
+function tiltForId(id) {
+    let hash = 0;
+    for (let i = 0; i < id.length; i++) {
+        hash = (hash * 31 + id.charCodeAt(i)) % 1000;
+    }
+    const deg = (hash / 1000) * 3 - 1.5; // range: -1.5deg .. 1.5deg
+    return `${deg.toFixed(2)}deg`;
+}
+
 function renderBoardCard(boardId, data) {
     const card = document.createElement('div');
     card.className = 'board-card';
     card.dataset.id = boardId;
+    card.style.setProperty('--tilt', tiltForId(boardId));
+
+    const pin = document.createElement('span');
+    pin.className = 'board-card-pin';
 
     const title = document.createElement('h3');
     title.className = 'board-card-title';
@@ -61,6 +81,7 @@ function renderBoardCard(boardId, data) {
         handleDeleteBoard(boardId, data.title);
     });
 
+    card.appendChild(pin);
     card.appendChild(deleteBtn);
     card.appendChild(title);
     card.appendChild(meta);
@@ -119,15 +140,27 @@ function listenToBoards(uid) {
     unsubscribeBoards = onSnapshot(boardsCollectionRef, renderBoards, err => {
         console.error('Failed to load boards:', err);
         emptyState.classList.remove('hidden');
-        const p = emptyState.querySelector('p');
-        if (p) p.textContent = "Couldn't load boards. Check Firestore rules / permissions.";
+        const p = emptyState.querySelector('.empty-state-title');
+        if (p) p.textContent = "Couldn't load boards.";
+        const sub = emptyState.querySelector('.empty-state-sub');
+        if (sub) sub.textContent = 'Check Firestore rules / permissions.';
     });
 }
 
-async function createBoard(uid) {
-    const title = window.prompt('Board name:');
-    if (!title || !title.trim()) return;
+// ---------------------------------------------------------------------------
+// Create-board modal
+// ---------------------------------------------------------------------------
+function openCreateModal() {
+    createInput.value = '';
+    createModal.classList.remove('hidden');
+    setTimeout(() => createInput.focus(), 0);
+}
 
+function closeCreateModal() {
+    createModal.classList.add('hidden');
+}
+
+async function createBoard(uid, title) {
     try {
         const docRef = await addDoc(boardsCollection(uid), {
             title: title.trim(),
@@ -143,6 +176,29 @@ async function createBoard(uid) {
         alert("Couldn't create board. Check Firestore rules / permissions.");
     }
 }
+
+createConfirmBtn.addEventListener('click', () => {
+    const user = auth.currentUser;
+    if (!user) return;
+    const title = createInput.value.trim();
+    if (!title) {
+        createInput.focus();
+        return;
+    }
+    closeCreateModal();
+    createBoard(user.uid, title);
+});
+
+createCancelBtn.addEventListener('click', closeCreateModal);
+
+createInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') createConfirmBtn.click();
+    if (e.key === 'Escape') closeCreateModal();
+});
+
+createModal.addEventListener('click', (e) => {
+    if (e.target === createModal) closeCreateModal();
+});
 
 function teardown() {
     if (unsubscribeBoards) {
@@ -164,11 +220,12 @@ initAuth({
     onSignedOut: () => {
         createBoardBtn.disabled = true;
         teardown();
+        closeCreateModal();
     }
 });
 
 createBoardBtn.addEventListener('click', () => {
     const user = auth.currentUser;
     if (!user) return;
-    createBoard(user.uid);
+    openCreateModal();
 });
