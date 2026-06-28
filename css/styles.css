@@ -15,19 +15,25 @@
     --accent-soft: #EEEBFF;
     --danger: #E5484D;
     --danger-soft: #FDEDEE;
+    --note-bg: #DCEEFC;
+    --note-border: #B9DEF7;
+    --note-ink: #0F2A43;
 }
 .dark {
-    --bg: #0F0F11;
-    --surface: #1C1C1F;
-    --surface-muted: #232327;
-    --border: #2C2C31;
-    --ink: #F4F4F5;
-    --ink-muted: #A1A1AA;
+    --bg: #060812;
+    --surface: #12152A;
+    --surface-muted: #1A1E38;
+    --border: #2A2F52;
+    --ink: #EDEFFC;
+    --ink-muted: #8A8FBF;
     --accent: #8A7CFF;
     --accent-hover: #9D91FF;
     --accent-soft: #221F3D;
     --danger: #F0656A;
     --danger-soft: #2D1A1C;
+    --note-bg: #1B1F44;
+    --note-border: #34396B;
+    --note-ink: #DCE0FF;
 }
 
 body {
@@ -56,6 +62,22 @@ body {
     transition: background-color 0.2s ease;
     cursor: grab;
 }
+.dark #board {
+    /* "Space" canvas: a soft navy glow plus a static starfield, no grid lines. */
+    background-color: var(--bg);
+    background-image:
+        radial-gradient(1px 1px at 20px 30px, rgba(255,255,255,0.9) 50%, transparent 100%),
+        radial-gradient(1px 1px at 90px 140px, rgba(255,255,255,0.7) 50%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 160px 60px, rgba(255,255,255,0.8) 50%, transparent 100%),
+        radial-gradient(1px 1px at 230px 190px, rgba(255,255,255,0.6) 50%, transparent 100%),
+        radial-gradient(1px 1px at 40px 210px, rgba(255,255,255,0.7) 50%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 280px 40px, rgba(255,255,255,0.9) 50%, transparent 100%),
+        radial-gradient(1px 1px at 120px 250px, rgba(255,255,255,0.5) 50%, transparent 100%),
+        radial-gradient(1px 1px at 300px 220px, rgba(255,255,255,0.6) 50%, transparent 100%),
+        radial-gradient(ellipse at 30% 20%, rgba(70, 60, 160, 0.25), transparent 60%),
+        radial-gradient(ellipse at 80% 70%, rgba(40, 80, 160, 0.18), transparent 55%);
+    background-size: 320px 320px, 320px 320px, 320px 320px, 320px 320px, 320px 320px, 320px 320px, 320px 320px, 320px 320px, 100% 100%, 100% 100%;
+}
 #board.is-panning {
     cursor: grabbing;
 }
@@ -76,13 +98,16 @@ body {
     width: 200px;
     height: 150px;
     padding: 16px 14px 14px 14px;
-    background-color: var(--surface);
-    border: 1px solid var(--border);
+    background-color: var(--note-bg);
+    border: 1px solid var(--note-border);
     border-radius: 10px;
     box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.06);
     cursor: grab;
-    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+    transition: box-shadow 0.15s ease, border-color 0.15s ease, background-color 0.2s ease;
     display: flex;
+}
+.dark .note {
+    box-shadow: 0 0 0 1px rgba(138, 124, 255, 0.08), 0 4px 16px rgba(0,0,0,0.5), 0 0 24px rgba(80, 70, 200, 0.15);
 }
 .note.is-deletable {
     cursor: crosshair;
@@ -105,7 +130,7 @@ body {
     transform: translateX(-50%);
     width: 14px;
     height: 14px;
-    background-color: var(--surface);
+    background-color: var(--note-bg);
     border: 2px solid var(--accent);
     border-radius: 50%;
     cursor: grab;
@@ -122,7 +147,7 @@ body {
     flex-grow: 1;
     font-size: 14px;
     line-height: 1.5;
-    color: var(--ink);
+    color: var(--note-ink);
     white-space: pre-wrap;
     word-wrap: break-word;
     transition: color 0.2s ease;
@@ -137,7 +162,7 @@ body {
     font-family: 'Inter', sans-serif;
     font-size: 14px;
     line-height: 1.5;
-    color: var(--ink);
+    color: var(--note-ink);
 }
 .resize-handle {
     position: absolute;
@@ -147,7 +172,7 @@ body {
     height: 10px;
     border-style: solid;
     border-width: 0 0 8px 8px;
-    border-color: transparent transparent var(--border) transparent;
+    border-color: transparent transparent var(--note-border) transparent;
     cursor: nwse-resize;
     z-index: 2;
     opacity: 0;
